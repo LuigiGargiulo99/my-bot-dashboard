@@ -4,6 +4,7 @@ import { useBot } from '../context/BotContext';
 
 export default function Topbar() {
     const { status } = useBot();
+    const botLabel = import.meta.env.VITE_BOT_LABEL;
 
     return (
         <header className="h-14 md:h-20 px-4 md:px-8 flex items-center justify-between border-b border-[#1e2329]/50 bg-[#09090b]/80 backdrop-blur-md sticky top-0 z-40 shrink-0">
@@ -20,6 +21,13 @@ export default function Topbar() {
                 </span>
                 <div className={`w-1.5 h-1.5 rounded-full ${status?.heartbeat_ok ? 'bg-emerald-500 animate-pulse' : 'bg-red-500'}`} />
             </div>
+
+            {/* CENTER: Bot Label (if configured via VITE_BOT_LABEL) */}
+            {botLabel && (
+                <div className="bg-amber-500/15 border border-amber-500/40 rounded-full px-4 py-1.5">
+                    <span className="text-amber-400 text-xs md:text-sm font-bold tracking-wide uppercase">{botLabel}</span>
+                </div>
+            )}
 
             {/* RIGHT: Actions */}
             <div className="flex items-center gap-2 md:gap-4">
