@@ -1,9 +1,9 @@
 import React, { useState, useEffect } from 'react';
 import { X } from 'lucide-react';
 
-const BASE_MAX = 40;
-const PRO_MAX = 60;
-const MIN_RISK = 0.01;
+const BASE_MAX = 0.3;
+const PRO_MAX = 1.0;
+const MIN_RISK = 0.1;
 const QUICK_SELECT = [0.1, 0.2, 0.3];
 
 export function RiskModal({ isOpen, currentRisk, onApply, onClose, loading = false }) {
@@ -25,22 +25,19 @@ export function RiskModal({ isOpen, currentRisk, onApply, onClose, loading = fal
 
   const handleSliderChange = (e) => {
     const val = parseFloat(e.target.value);
-    setRisk(Math.min(val, maxRisk));
-  };
-
-  const handleInputChange = (e) => {
-    const raw = e.target.value;
-    if (raw === '' || raw === '.') return;
-    const val = parseFloat(raw);
-    if (!isNaN(val)) {
-      setRisk(Math.max(MIN_RISK, Math.min(val, maxRisk)));
-    }
+    // Snap to nearest 0.1
+    const snapped = Math.round(val * 10) / 10;
+    setRisk(Math.max(MIN_RISK, Math.min(snapped, maxRisk)));
   };
 
   const handleTabSwitch = (newTab) => {
     setTab(newTab);
     const newMax = newTab === 'pro' ? PRO_MAX : BASE_MAX;
     if (risk > newMax) setRisk(newMax);
+    // When switching to PRO, snap to nearest 0.1
+    if (newTab === 'pro') {
+      setRisk(prev => Math.round(Math.max(MIN_RISK, Math.min(prev, newMax)) * 10) / 10);
+    }
   };
 
   const handleApply = () => {
@@ -98,14 +95,20 @@ export function RiskModal({ isOpen, currentRisk, onApply, onClose, loading = fal
             </button>
           </div>
 
-          {/* Quick Select (Base only) */}
+          {/* Current Risk Display */}
+          <div className="text-center mb-5">
+            <span className="text-4xl font-bold text-white">{risk.toFixed(1)}</span>
+            <span className="text-xl text-zinc-500 ml-1">%</span>
+          </div>
+
+          {/* BASE: only 3 buttons */}
           {tab === 'base' && (
             <div className="flex gap-2 mb-4">
               {QUICK_SELECT.map((val) => (
                 <button
                   key={val}
                   onClick={() => setRisk(val)}
-                  className={`flex-1 py-2 rounded-xl text-sm font-medium transition-all border ${
+                  className={`flex-1 py-3 rounded-xl text-base font-semibold transition-all border ${
                     Math.abs(risk - val) < 0.005
                       ? 'bg-emerald-500/20 border-emerald-500/50 text-emerald-400'
                       : 'bg-zinc-800 border-zinc-700 text-zinc-400 hover:border-zinc-600'
@@ -117,50 +120,27 @@ export function RiskModal({ isOpen, currentRisk, onApply, onClose, loading = fal
             </div>
           )}
 
-          {/* Current Risk Display */}
-          <div className="text-center mb-4">
-            <span className="text-4xl font-bold text-white">{risk.toFixed(2)}</span>
-            <span className="text-xl text-zinc-500 ml-1">%</span>
-          </div>
-
-          {/* Slider */}
-          <div className="px-1 mb-2">
-            <input
-              type="range"
-              min={MIN_RISK}
-              max={maxRisk}
-              step={0.01}
-              value={risk}
-              onChange={handleSliderChange}
-              className="w-full h-2 rounded-full appearance-none cursor-pointer"
-              style={{
-                background: `linear-gradient(to right, #10b981 0%, ${tab === 'pro' ? '#ef4444' : '#f59e0b'} ${sliderPercent}%, #3f3f46 ${sliderPercent}%, #3f3f46 100%)`
-              }}
-            />
-            <div className="flex justify-between text-xs text-zinc-600 mt-1">
-              <span>{MIN_RISK}%</span>
-              <span>{maxRisk}%</span>
+          {/* PRO: slider 0.1 - 1.0, step 0.1 */}
+          {tab === 'pro' && (
+            <div className="px-1 mb-4">
+              <input
+                type="range"
+                min={MIN_RISK}
+                max={PRO_MAX}
+                step={0.1}
+                value={risk}
+                onChange={handleSliderChange}
+                className="w-full h-2 rounded-full appearance-none cursor-pointer"
+                style={{
+                  background: `linear-gradient(to right, #10b981 0%, #ef4444 ${sliderPercent}%, #3f3f46 ${sliderPercent}%, #3f3f46 100%)`
+                }}
+              />
+              <div className="flex justify-between text-xs text-zinc-600 mt-1">
+                <span>{MIN_RISK}%</span>
+                <span>{PRO_MAX}%</span>
+              </div>
             </div>
-          </div>
-
-          {/* Numeric Input */}
-          <div className="flex items-center justify-center gap-2 mb-4">
-            <input
-              type="number"
-              min={MIN_RISK}
-              max={maxRisk}
-              step={0.01}
-              value={risk.toFixed(2)}
-              onChange={handleInputChange}
-              className="w-28 bg-zinc-800 border border-zinc-700 rounded-xl px-3 py-2 text-center text-white font-medium focus:outline-none focus:border-emerald-500/50"
-            />
-            <span className="text-zinc-500 text-sm">% equity</span>
-          </div>
-
-          {/* Max Risk Warning */}
-          <p className="text-red-400 text-xs text-center font-medium">
-            Rischio massimo per trade: {maxRisk}% dell'equity
-          </p>
+          )}
         </div>
 
         {/* Footer — always visible, never hidden behind bottom nav */}
