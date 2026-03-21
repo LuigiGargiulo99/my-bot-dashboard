@@ -117,6 +117,7 @@ export function BotProvider({ children }) {
   const resume = () => sendCommand(() => api.resume());
   const switchPreset = (preset) => sendCommand(() => api.switchPreset(preset));
   const setRisk = (riskPercent) => sendCommand(() => api.setRisk(riskPercent));
+  const setDrawdown = (pct) => sendCommand(() => api.setDrawdown(pct));
   const kill = () => sendCommand(() => api.kill());
   const forceClose = () => sendCommand(() => api.forceClose());
 
@@ -159,6 +160,7 @@ export function BotProvider({ children }) {
     resume,
     switchPreset,
     setRisk,
+    setDrawdown,
     kill,
     forceClose,
     // Auth

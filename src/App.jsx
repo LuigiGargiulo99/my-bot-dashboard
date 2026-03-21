@@ -78,7 +78,7 @@ const ErrorBanner = ({ message, onRetry }) => (
 // --- VIEWS ---
 
 const DashboardView = () => {
-  const { status, trades, commandPending, pause, resume, setRisk, kill, forceClose, error, refreshStatus } = useBot();
+  const { status, config, trades, commandPending, pause, resume, setRisk, setDrawdown, kill, forceClose, error, refreshStatus } = useBot();
   const [showKillConfirm, setShowKillConfirm] = useState(false);
   const [showForceCloseConfirm, setShowForceCloseConfirm] = useState(false);
   const [showPresetModal, setShowPresetModal] = useState(false);
@@ -132,7 +132,7 @@ const DashboardView = () => {
             />
           </div>
           <div className="min-h-[256px]">
-            <DiagnosticsWidget status={status} />
+            <DiagnosticsWidget status={status} config={config} />
           </div>
         </div>
 
@@ -180,7 +180,12 @@ const DashboardView = () => {
       <RiskModal
         isOpen={showPresetModal}
         currentRisk={status.risk_percent}
+        currentDrawdown={status.max_daily_loss_pct}
+        equity={status.equity}
+        activePreset={status.active_preset}
+        presets={config?.presets}
         onApply={async (riskPercent) => { await setRisk(riskPercent); setShowPresetModal(false); }}
+        onApplyDrawdown={async (pct) => { await setDrawdown(pct); }}
         onClose={() => setShowPresetModal(false)}
         loading={commandPending}
       />

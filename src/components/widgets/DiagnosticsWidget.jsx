@@ -2,7 +2,7 @@ import React from 'react';
 import { ShieldAlert, Cpu } from 'lucide-react';
 import { motion, AnimatePresence } from 'framer-motion';
 
-export default function DiagnosticsWidget({ status }) {
+export default function DiagnosticsWidget({ status, config }) {
     if (!status) return null;
 
     // Map last_signal to human-readable blocking reason with details
@@ -57,6 +57,11 @@ export default function DiagnosticsWidget({ status }) {
     const isInTrade = status.status === 'IN_TRADE' && status.position?.has_position;
     const isBlocked = !isInTrade && blockReasons.length > 0;
 
+    // Detect custom (PRO) risk: risk_percent differs from preset's default
+    const presetConfig = config?.presets?.[status.active_preset];
+    const isProRisk = presetConfig
+        && Math.abs((status.risk_percent || 0) - (presetConfig.risk_percent || 0)) > 0.001;
+
     const formatTime = (isoString) => {
         if (!isoString) return '--:--:--';
         const date = new Date(isoString);
@@ -89,7 +94,15 @@ export default function DiagnosticsWidget({ status }) {
                     </div>
                     <div className="text-right">
                         <p className="text-zinc-500 text-[9px] md:text-[10px] uppercase font-semibold mb-0.5">Preset</p>
-                        <span className="text-emerald-400 font-mono text-xs md:text-sm border border-emerald-500/20 bg-emerald-500/10 px-2 py-0.5 rounded">{status.active_preset}</span>
+                        {isProRisk ? (
+                            <span className="text-violet-400 font-mono text-xs md:text-sm border border-violet-500/20 bg-violet-500/10 px-2 py-0.5 rounded">
+                                PRO {(status.risk_percent || 0).toFixed(2)}%
+                            </span>
+                        ) : (
+                            <span className="text-emerald-400 font-mono text-xs md:text-sm border border-emerald-500/20 bg-emerald-500/10 px-2 py-0.5 rounded">
+                                {status.active_preset}
+                            </span>
+                        )}
                     </div>
                 </div>
 

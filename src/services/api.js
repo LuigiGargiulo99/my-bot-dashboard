@@ -116,6 +116,10 @@ class ApiService {
     return this.sendCommand('set_risk', { risk_percent: riskPercent });
   }
 
+  async setDrawdown(pct) {
+    return this.sendCommand('set_drawdown', { max_daily_loss_pct: pct });
+  }
+
   async kill() {
     return this.sendCommand('kill');
   }
