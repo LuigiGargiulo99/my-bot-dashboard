@@ -2,12 +2,12 @@ import React, { useState, useEffect } from 'react';
 import { X } from 'lucide-react';
 
 const BASE_MAX = 0.3;
-const PRO_MAX = 1.0;
+const PRO_MAX = 100.0;
 const MIN_RISK = 0.1;
 const QUICK_SELECT = [0.1, 0.2, 0.3];
 
 const DD_MIN = 0.5;
-const DD_MAX = 5.0;
+const DD_MAX = 100.0;
 const DD_STEP = 0.5;
 
 export function RiskModal({ isOpen, currentRisk, currentDrawdown, equity, activePreset, presets, onApply, onApplyDrawdown, onClose, loading = false }) {
