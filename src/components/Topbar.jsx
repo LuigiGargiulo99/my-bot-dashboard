@@ -5,6 +5,14 @@ import { useBot } from '../context/BotContext';
 export default function Topbar() {
     const { status } = useBot();
     const botLabel = import.meta.env.VITE_BOT_LABEL;
+    const botColor = import.meta.env.VITE_BOT_COLOR || 'amber';
+    const colorMap = {
+        amber: 'bg-amber-500/15 border-amber-500/40 text-amber-400',
+        blue: 'bg-blue-500/15 border-blue-500/40 text-blue-400',
+        green: 'bg-green-500/15 border-green-500/40 text-green-400',
+        purple: 'bg-purple-500/15 border-purple-500/40 text-purple-400',
+    };
+    const bannerClasses = colorMap[botColor] || colorMap.amber;
 
     return (
         <header className="h-14 md:h-20 px-4 md:px-8 flex items-center justify-between border-b border-[#1e2329]/50 bg-[#09090b]/80 backdrop-blur-md sticky top-0 z-40 shrink-0">
@@ -24,8 +32,8 @@ export default function Topbar() {
 
             {/* CENTER: Bot Label (if configured via VITE_BOT_LABEL) */}
             {botLabel && (
-                <div className="bg-amber-500/15 border border-amber-500/40 rounded-full px-4 py-1.5">
-                    <span className="text-amber-400 text-xs md:text-sm font-bold tracking-wide uppercase">{botLabel}</span>
+                <div className={`${bannerClasses} border rounded-full px-4 py-1.5`}>
+                    <span className="text-xs md:text-sm font-bold tracking-wide uppercase">{botLabel}</span>
                 </div>
             )}
 

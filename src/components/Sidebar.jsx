@@ -17,7 +17,7 @@ export default function Sidebar({ activeTab, setActiveTab, onLogout }) {
                 <div className="w-8 h-8 rounded-lg bg-emerald-500/10 border border-emerald-500/20 flex items-center justify-center">
                     <ChartPieSlice size={18} className="text-emerald-400" />
                 </div>
-                <span className="text-white font-bold tracking-wide">E8 <span className="text-zinc-500 font-normal">Bot</span></span>
+                <span className="text-white font-bold tracking-wide">{import.meta.env.VITE_BOT_LABEL || 'Trading Bot'}</span>
             </div>
 
             {/* NAVIGATION */}
