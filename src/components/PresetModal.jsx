@@ -1,5 +1,5 @@
 import React, { useState, useEffect } from 'react';
-import { X } from 'lucide-react';
+import { X, Minus, Plus } from 'lucide-react';
 
 const BASE_MAX = 0.3;
 const PRO_MAX = 100.0;
@@ -8,7 +8,7 @@ const QUICK_SELECT = [0.1, 0.2, 0.3];
 
 const DD_MIN = 0.5;
 const DD_MAX = 100.0;
-const DD_STEP = 0.5;
+const DD_STEP = 0.1;
 
 export function RiskModal({ isOpen, currentRisk, currentDrawdown, equity, activePreset, presets, onApply, onApplyDrawdown, onClose, loading = false }) {
   const [tab, setTab] = useState('base');
@@ -57,7 +57,7 @@ export function RiskModal({ isOpen, currentRisk, currentDrawdown, equity, active
 
   const handleDdSliderChange = (e) => {
     const val = parseFloat(e.target.value);
-    const snapped = Math.round(val * 2) / 2; // snap to 0.5
+    const snapped = Math.round(val * 10) / 10; // snap to 0.1
     setDrawdown(Math.max(DD_MIN, Math.min(snapped, DD_MAX)));
   };
 
@@ -66,22 +66,39 @@ export function RiskModal({ isOpen, currentRisk, currentDrawdown, equity, active
     if (isNaN(usd) || usd <= 0) return;
     const pct = pctFromDollar(usd);
     const clamped = Math.max(DD_MIN, Math.min(pct, DD_MAX));
-    setDrawdown(Math.round(clamped * 2) / 2); // snap to 0.5
+    setDrawdown(Math.round(clamped * 10) / 10); // snap to 0.1
+  };
+
+  // +/- handlers
+  const adjustRisk = (delta) => {
+    setRisk(prev => {
+      const next = Math.round((prev + delta) * 10) / 10;
+      return Math.max(MIN_RISK, Math.min(next, maxRisk));
+    });
+  };
+
+  const adjustDrawdown = (delta) => {
+    setDrawdown(prev => {
+      const next = Math.round((prev + delta) * 10) / 10;
+      return Math.max(DD_MIN, Math.min(next, DD_MAX));
+    });
   };
 
   const riskChanged = Math.abs(risk - (currentRisk || 0)) > 0.005;
   const ddChanged = Math.abs(drawdown - initialDrawdown) > 0.05;
 
   const handleApply = async () => {
+    if (!riskChanged && !ddChanged) {
+      onClose();
+      return;
+    }
     if (riskChanged) {
-      onApply(parseFloat(risk.toFixed(2)));
+      await onApply(parseFloat(risk.toFixed(2)));
     }
     if (ddChanged && onApplyDrawdown) {
       await onApplyDrawdown(parseFloat(drawdown.toFixed(1)));
     }
-    if (!riskChanged && !ddChanged) {
-      onClose();
-    }
+    onClose();
   };
 
   // Slider gradient position
@@ -198,21 +215,35 @@ export function RiskModal({ isOpen, currentRisk, currentDrawdown, equity, active
             </div>
           )}
 
-          {/* PRO: slider 0.1 - 1.0, step 0.1 */}
+          {/* PRO: slider + buttons */}
           {tab === 'pro' && (
             <div className="px-1 mb-4">
-              <input
-                type="range"
-                min={MIN_RISK}
-                max={PRO_MAX}
-                step={0.1}
-                value={risk}
-                onChange={handleSliderChange}
-                className="w-full h-2 rounded-full appearance-none cursor-pointer"
-                style={{
-                  background: `linear-gradient(to right, #10b981 0%, #ef4444 ${sliderPercent}%, #3f3f46 ${sliderPercent}%, #3f3f46 100%)`
-                }}
-              />
+              <div className="flex items-center gap-3 mb-2">
+                <button
+                  onClick={() => adjustRisk(-0.1)}
+                  className="w-10 h-10 rounded-xl bg-zinc-800 border border-zinc-700 text-zinc-300 hover:bg-zinc-700 hover:border-zinc-600 transition-all flex items-center justify-center active:scale-95"
+                >
+                  <Minus size={18} />
+                </button>
+                <input
+                  type="range"
+                  min={MIN_RISK}
+                  max={PRO_MAX}
+                  step={0.1}
+                  value={risk}
+                  onChange={handleSliderChange}
+                  className="flex-1 h-2 rounded-full appearance-none cursor-pointer"
+                  style={{
+                    background: `linear-gradient(to right, #10b981 0%, #ef4444 ${sliderPercent}%, #3f3f46 ${sliderPercent}%, #3f3f46 100%)`
+                  }}
+                />
+                <button
+                  onClick={() => adjustRisk(0.1)}
+                  className="w-10 h-10 rounded-xl bg-zinc-800 border border-zinc-700 text-zinc-300 hover:bg-zinc-700 hover:border-zinc-600 transition-all flex items-center justify-center active:scale-95"
+                >
+                  <Plus size={18} />
+                </button>
+              </div>
               <div className="flex justify-between text-xs text-zinc-600 mt-1">
                 <span>{MIN_RISK}%</span>
                 <span>{PRO_MAX}%</span>
@@ -261,24 +292,38 @@ export function RiskModal({ isOpen, currentRisk, currentDrawdown, equity, active
                 </div>
 
                 {ddMode === 'pct' ? (
-                  /* Percentage mode: slider */
+                  /* Percentage mode: slider + buttons */
                   <div className="px-1">
                     <div className="flex items-baseline justify-between mb-2">
                       <span className="text-2xl font-bold text-white">{drawdown.toFixed(1)}%</span>
                       <span className="text-zinc-500 font-mono text-sm">${ddDollar.toFixed(2)}</span>
                     </div>
-                    <input
-                      type="range"
-                      min={DD_MIN}
-                      max={DD_MAX}
-                      step={DD_STEP}
-                      value={drawdown}
-                      onChange={handleDdSliderChange}
-                      className="w-full h-2 rounded-full appearance-none cursor-pointer"
-                      style={{
-                        background: `linear-gradient(to right, #f59e0b 0%, #ef4444 ${ddSliderPercent}%, #3f3f46 ${ddSliderPercent}%, #3f3f46 100%)`
-                      }}
-                    />
+                    <div className="flex items-center gap-3">
+                      <button
+                        onClick={() => adjustDrawdown(-0.1)}
+                        className="w-10 h-10 rounded-xl bg-zinc-800 border border-zinc-700 text-zinc-300 hover:bg-zinc-700 hover:border-zinc-600 transition-all flex items-center justify-center active:scale-95"
+                      >
+                        <Minus size={18} />
+                      </button>
+                      <input
+                        type="range"
+                        min={DD_MIN}
+                        max={DD_MAX}
+                        step={DD_STEP}
+                        value={drawdown}
+                        onChange={handleDdSliderChange}
+                        className="flex-1 h-2 rounded-full appearance-none cursor-pointer"
+                        style={{
+                          background: `linear-gradient(to right, #f59e0b 0%, #ef4444 ${ddSliderPercent}%, #3f3f46 ${ddSliderPercent}%, #3f3f46 100%)`
+                        }}
+                      />
+                      <button
+                        onClick={() => adjustDrawdown(0.1)}
+                        className="w-10 h-10 rounded-xl bg-zinc-800 border border-zinc-700 text-zinc-300 hover:bg-zinc-700 hover:border-zinc-600 transition-all flex items-center justify-center active:scale-95"
+                      >
+                        <Plus size={18} />
+                      </button>
+                    </div>
                     <div className="flex justify-between text-xs text-zinc-600 mt-1">
                       <span>{DD_MIN}%</span>
                       <span>{DD_MAX}%</span>

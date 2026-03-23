@@ -94,15 +94,20 @@ export default function DiagnosticsWidget({ status, config }) {
                     </div>
                     <div className="text-right">
                         <p className="text-zinc-500 text-[9px] md:text-[10px] uppercase font-semibold mb-0.5">Preset</p>
-                        {isProRisk ? (
-                            <span className="text-violet-400 font-mono text-xs md:text-sm border border-violet-500/20 bg-violet-500/10 px-2 py-0.5 rounded">
-                                PRO {(status.risk_percent || 0).toFixed(2)}%
+                        <div className="flex flex-col items-end gap-1">
+                            {isProRisk ? (
+                                <span className="text-violet-400 font-mono text-xs md:text-sm border border-violet-500/20 bg-violet-500/10 px-2 py-0.5 rounded">
+                                    PRO {(status.risk_percent || 0).toFixed(2)}%
+                                </span>
+                            ) : (
+                                <span className="text-emerald-400 font-mono text-xs md:text-sm border border-emerald-500/20 bg-emerald-500/10 px-2 py-0.5 rounded">
+                                    {status.active_preset}
+                                </span>
+                            )}
+                            <span className="text-amber-400/80 font-mono text-[9px] md:text-[10px] border border-amber-500/15 bg-amber-500/5 px-1.5 py-0.5 rounded">
+                                DD {(status.max_daily_loss_pct || 1.0).toFixed(1)}%
                             </span>
-                        ) : (
-                            <span className="text-emerald-400 font-mono text-xs md:text-sm border border-emerald-500/20 bg-emerald-500/10 px-2 py-0.5 rounded">
-                                {status.active_preset}
-                            </span>
-                        )}
+                        </div>
                     </div>
                 </div>
 

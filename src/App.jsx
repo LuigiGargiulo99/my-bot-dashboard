@@ -184,7 +184,7 @@ const DashboardView = () => {
         equity={status.equity}
         activePreset={status.active_preset}
         presets={config?.presets}
-        onApply={async (riskPercent) => { await setRisk(riskPercent); setShowPresetModal(false); }}
+        onApply={async (riskPercent) => { await setRisk(riskPercent); }}
         onApplyDrawdown={async (pct) => { await setDrawdown(pct); }}
         onClose={() => setShowPresetModal(false)}
         loading={commandPending}
