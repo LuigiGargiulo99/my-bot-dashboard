@@ -55,30 +55,46 @@ export default function TradeStatusWidget({ status, lastTrade }) {
                                 </div>
                             </div>
 
-                            <div className="grid grid-cols-2 gap-1.5 md:gap-2 mt-3 md:mt-4 pt-3 md:pt-4 border-t border-white/5">
-                                <div className="bg-[#09090b]/50 p-1.5 md:p-2 rounded-lg border border-white/5">
-                                    <span className="text-zinc-500 text-[9px] md:text-[10px] uppercase block mb-0.5">Entry</span>
-                                    <span className="text-white font-mono text-[11px] md:text-sm">{(status.position.open_price || 0).toFixed(2)}</span>
-                                </div>
-                                <div className="bg-[#09090b]/50 p-1.5 md:p-2 rounded-lg border border-white/5">
-                                    <span className="text-zinc-500 text-[9px] md:text-[10px] uppercase block mb-0.5">Aperto</span>
-                                    <span className="text-white font-mono text-[11px] md:text-sm">{formatBrokerToItalian(status.position.open_time)}</span>
-                                </div>
-                                <div className="bg-[#09090b]/50 p-1.5 md:p-2 rounded-lg border border-white/5 flex flex-col">
-                                    <div className="flex items-center justify-between mb-0.5">
-                                        <span className="text-zinc-500 text-[9px] md:text-[10px] uppercase">SL</span>
-                                        <Shield size={9} className="text-red-400/50" />
+                            {(() => {
+                                const entry = status.position.open_price || 0;
+                                const sl = status.position.sl || 0;
+                                const isLong = status.position.side === 'BUY';
+                                const trailActive = entry > 0 && sl > 0 && (isLong ? sl >= entry : sl <= entry);
+                                const lockedProfit = trailActive ? Math.abs(sl - entry).toFixed(2) : null;
+                                return (
+                                    <div className="grid grid-cols-2 gap-1.5 md:gap-2 mt-3 md:mt-4 pt-3 md:pt-4 border-t border-white/5">
+                                        <div className="bg-[#09090b]/50 p-1.5 md:p-2 rounded-lg border border-white/5">
+                                            <span className="text-zinc-500 text-[9px] md:text-[10px] uppercase block mb-0.5">Entry</span>
+                                            <span className="text-white font-mono text-[11px] md:text-sm">{entry.toFixed(2)}</span>
+                                        </div>
+                                        <div className="bg-[#09090b]/50 p-1.5 md:p-2 rounded-lg border border-white/5">
+                                            <span className="text-zinc-500 text-[9px] md:text-[10px] uppercase block mb-0.5">Aperto</span>
+                                            <span className="text-white font-mono text-[11px] md:text-sm">{formatBrokerToItalian(status.position.open_time)}</span>
+                                        </div>
+                                        <div className={`bg-[#09090b]/50 p-1.5 md:p-2 rounded-lg border ${trailActive ? 'border-emerald-500/30 bg-emerald-500/5' : 'border-white/5'} flex flex-col`}>
+                                            <div className="flex items-center justify-between mb-0.5">
+                                                <span className="text-zinc-500 text-[9px] md:text-[10px] uppercase">SL</span>
+                                                {trailActive ? (
+                                                    <span className="text-[8px] md:text-[9px] font-bold text-emerald-400 bg-emerald-500/15 px-1 rounded">TRAIL</span>
+                                                ) : (
+                                                    <Shield size={9} className="text-red-400/50" />
+                                                )}
+                                            </div>
+                                            <span className={`font-mono text-[11px] md:text-sm ${trailActive ? 'text-emerald-400' : 'text-white'}`}>{sl.toFixed(2)}</span>
+                                            {lockedProfit && (
+                                                <span className="text-emerald-400/70 font-mono text-[9px] mt-0.5">+{lockedProfit} locked</span>
+                                            )}
+                                        </div>
+                                        <div className="bg-[#09090b]/50 p-1.5 md:p-2 rounded-lg border border-white/5 flex flex-col">
+                                            <div className="flex items-center justify-between mb-0.5">
+                                                <span className="text-zinc-500 text-[9px] md:text-[10px] uppercase">TP</span>
+                                                <Target size={9} className="text-emerald-400/50" />
+                                            </div>
+                                            <span className="text-white font-mono text-[11px] md:text-sm">{(status.position.tp || 0).toFixed(2)}</span>
+                                        </div>
                                     </div>
-                                    <span className="text-white font-mono text-[11px] md:text-sm">{(status.position.sl || 0).toFixed(2)}</span>
-                                </div>
-                                <div className="bg-[#09090b]/50 p-1.5 md:p-2 rounded-lg border border-white/5 flex flex-col">
-                                    <div className="flex items-center justify-between mb-0.5">
-                                        <span className="text-zinc-500 text-[9px] md:text-[10px] uppercase">TP</span>
-                                        <Target size={9} className="text-emerald-400/50" />
-                                    </div>
-                                    <span className="text-white font-mono text-[11px] md:text-sm">{(status.position.tp || 0).toFixed(2)}</span>
-                                </div>
-                            </div>
+                                );
+                            })()}
                         </motion.div>
                     ) : (
                         <motion.div key="no-trade" className="flex items-center justify-center py-4 md:py-6 text-zinc-600 text-xs md:text-sm">
