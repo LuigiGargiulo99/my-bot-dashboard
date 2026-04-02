@@ -57,10 +57,11 @@ export default function DiagnosticsWidget({ status, config }) {
     const isInTrade = status.status === 'IN_TRADE' && status.position?.has_position;
     const isBlocked = !isInTrade && blockReasons.length > 0;
 
-    // Detect custom (PRO) risk: risk_percent differs from preset's default
+    // Detect custom (PRO) risk: risk_percent differs from preset's default OR fixed lots active
     const presetConfig = config?.presets?.[status.active_preset];
-    const isProRisk = presetConfig
-        && Math.abs((status.risk_percent || 0) - (presetConfig.risk_percent || 0)) > 0.001;
+    const isFixedLots = (status.fixed_lots || 0) > 0;
+    const isProRisk = isFixedLots || (presetConfig
+        && Math.abs((status.risk_percent || 0) - (presetConfig.risk_percent || 0)) > 0.001);
 
     const formatTime = (isoString) => {
         if (!isoString) return '--:--:--';
@@ -97,7 +98,9 @@ export default function DiagnosticsWidget({ status, config }) {
                         <div className="flex flex-col items-end gap-1">
                             {isProRisk ? (
                                 <span className="text-violet-400 font-mono text-xs md:text-sm border border-violet-500/20 bg-violet-500/10 px-2 py-0.5 rounded">
-                                    PRO {(status.risk_percent || 0).toFixed(2)}%
+                                    {isFixedLots
+                                        ? `PRO ${(status.fixed_lots || 0).toFixed(2)} lots`
+                                        : `PRO ${(status.risk_percent || 0).toFixed(2)}%`}
                                 </span>
                             ) : (
                                 <span className="text-emerald-400 font-mono text-xs md:text-sm border border-emerald-500/20 bg-emerald-500/10 px-2 py-0.5 rounded">
