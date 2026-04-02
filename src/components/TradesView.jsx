@@ -26,7 +26,7 @@ export default function TradesView() {
                             <span>
                                 {' '}&middot; {wins}W / {losses}L &middot; P&L:{' '}
                                 <span className={totalPnl >= 0 ? 'text-emerald-400' : 'text-red-400'}>
-                                    {totalPnl >= 0 ? '+' : ''}${totalPnl.toFixed(2)}
+                                    {totalPnl >= 0 ? '+' : ''}€{totalPnl.toFixed(2)}
                                 </span>
                             </span>
                         )}
@@ -107,7 +107,7 @@ export default function TradesView() {
                                                 </span>
                                             </td>
                                             <td className={`px-4 py-3 font-mono text-xs text-right font-bold ${isWin ? 'text-emerald-400' : 'text-red-400'}`}>
-                                                {isWin ? '+' : ''}${(trade.pnl || 0).toFixed(2)}
+                                                {isWin ? '+' : ''}€{(trade.pnl || 0).toFixed(2)}
                                             </td>
                                         </tr>
                                     );

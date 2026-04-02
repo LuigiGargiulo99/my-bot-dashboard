@@ -118,6 +118,7 @@ export function BotProvider({ children }) {
   const switchPreset = (preset) => sendCommand(() => api.switchPreset(preset));
   const setRisk = (riskPercent) => sendCommand(() => api.setRisk(riskPercent));
   const setDrawdown = (pct) => sendCommand(() => api.setDrawdown(pct));
+  const setLots = (lots) => sendCommand(() => api.setLots(lots));
   const kill = () => sendCommand(() => api.kill());
   const forceClose = () => sendCommand(() => api.forceClose());
 
@@ -161,6 +162,7 @@ export function BotProvider({ children }) {
     switchPreset,
     setRisk,
     setDrawdown,
+    setLots,
     kill,
     forceClose,
     // Auth

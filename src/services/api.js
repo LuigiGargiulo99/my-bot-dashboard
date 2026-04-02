@@ -120,6 +120,10 @@ class ApiService {
     return this.sendCommand('set_drawdown', { max_daily_loss_pct: pct });
   }
 
+  async setLots(lots) {
+    return this.sendCommand('set_lots', { lots });
+  }
+
   async kill() {
     return this.sendCommand('kill');
   }

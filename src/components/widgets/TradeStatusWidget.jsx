@@ -46,7 +46,7 @@ export default function TradeStatusWidget({ status, lastTrade }) {
                                 <div>
                                     <p className="text-zinc-500 text-[10px] md:text-xs mb-1">Current PnL</p>
                                     <div className={`text-2xl md:text-4xl font-sans tracking-tight ${pnlPositive ? 'text-emerald-400' : 'text-red-400'}`}>
-                                        {pnlPositive ? '+' : ''}${(status.position.pnl || 0).toFixed(2)}
+                                        {pnlPositive ? '+' : ''}€{(status.position.pnl || 0).toFixed(2)}
                                     </div>
                                 </div>
                                 <div className="text-right">
@@ -129,7 +129,7 @@ export default function TradeStatusWidget({ status, lastTrade }) {
                             </div>
                         </div>
                         <div className={`text-lg md:text-xl font-mono ${(lastTrade.pnl || 0) >= 0 ? 'text-emerald-400' : 'text-red-400'}`}>
-                            {(lastTrade.pnl || 0) >= 0 ? '+' : ''}{(lastTrade.pnl || 0).toFixed(2)}$
+                            {(lastTrade.pnl || 0) >= 0 ? '+' : ''}{(lastTrade.pnl || 0).toFixed(2)}€
                         </div>
                     </div>
                 ) : (

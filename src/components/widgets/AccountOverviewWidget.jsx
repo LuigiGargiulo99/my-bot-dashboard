@@ -30,15 +30,15 @@ export default function AccountOverviewWidget({ status, trades, winRate }) {
 
                 <p className="text-zinc-500 text-xs mb-1">Current Balance</p>
                 <h1 className="text-3xl sm:text-4xl md:text-5xl xl:text-6xl font-sans font-medium text-white metric-value tracking-tighter mb-3 md:mb-4">
-                    ${(status.equity || 0).toLocaleString('en-US', { minimumFractionDigits: 2, maximumFractionDigits: 2 })}
-                    <span className="text-base md:text-xl text-zinc-500 font-normal ml-1.5">USD</span>
+                    €{(status.equity || 0).toLocaleString('en-US', { minimumFractionDigits: 2, maximumFractionDigits: 2 })}
+                    <span className="text-base md:text-xl text-zinc-500 font-normal ml-1.5">EUR</span>
                 </h1>
 
                 <div className="flex items-center gap-3">
                     <div className={`flex items-center gap-1.5 ${pnlPositive ? 'text-emerald-400' : 'text-red-400'}`}>
                         {pnlPositive ? <TrendingUp size={18} /> : <TrendingDown size={18} />}
                         <span className="text-lg md:text-xl font-medium">
-                            {pnlPositive ? '+' : ''}${(status.daily_pnl || 0).toFixed(2)}
+                            {pnlPositive ? '+' : ''}€{(status.daily_pnl || 0).toFixed(2)}
                         </span>
                     </div>
                     <div className={`px-2 py-0.5 rounded-md text-xs md:text-sm font-medium ${pnlPositive ? 'bg-emerald-500/10 text-emerald-400' : 'bg-red-500/10 text-red-400'}`}>

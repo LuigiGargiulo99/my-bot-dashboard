@@ -78,7 +78,7 @@ const ErrorBanner = ({ message, onRetry }) => (
 // --- VIEWS ---
 
 const DashboardView = () => {
-  const { status, config, trades, commandPending, pause, resume, setRisk, setDrawdown, kill, forceClose, error, refreshStatus } = useBot();
+  const { status, config, trades, commandPending, pause, resume, setRisk, setDrawdown, setLots, kill, forceClose, error, refreshStatus } = useBot();
   const [showKillConfirm, setShowKillConfirm] = useState(false);
   const [showForceCloseConfirm, setShowForceCloseConfirm] = useState(false);
   const [showPresetModal, setShowPresetModal] = useState(false);
@@ -186,8 +186,15 @@ const DashboardView = () => {
         presets={config?.presets}
         onApply={async (riskPercent) => { await setRisk(riskPercent); }}
         onApplyDrawdown={async (pct) => { await setDrawdown(pct); }}
+        onApplyLots={async (lots) => { await setLots(lots); }}
         onClose={() => setShowPresetModal(false)}
         loading={commandPending}
+        currentPrice={status.current_price || 0}
+        atrValue={status.atr_value || 0}
+        tickValue={status.tick_value || 0}
+        tickSize={status.tick_size || 0}
+        maxLots={status.max_lots || 0}
+        currentLots={status.fixed_lots || 0}
       />
     </div>
   );
